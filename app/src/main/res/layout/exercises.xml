@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Exercises"
+        android:id="@+id/exerciseTextView"
+        android:textColor="@color/blue"
+        android:textSize="30sp"
+        android:gravity="center"
+        android:background="@color/headerGray"
+        android:layout_centerHorizontal="true"
+        />
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/filterExerciseTIL"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_below="@id/exerciseTextView"
+        app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
+        <EditText
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:ems="10"
+            android:id="@+id/filterExerciseEditText"
+            android:hint="Filter"
+            android:imeOptions="actionDone"
+            />
+    </android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/addExercise"
+        android:text="Add New Exercise"
+        android:textColor="@color/blue"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        />
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/filterExerciseTIL"
+        android:layout_above="@id/addExercise"
+        android:id="@+id/exerciseListView">
+    </ListView>
+
+</RelativeLayout>
