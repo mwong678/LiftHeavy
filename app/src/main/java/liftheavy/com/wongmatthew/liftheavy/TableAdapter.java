@@ -38,7 +38,10 @@ public class TableAdapter extends BaseAdapter{
 
     @Override
     public int getCount() {
-        return mDataSource.get(key);
+        if (mDataSource.get(key) != null){
+            return mDataSource.get(key);
+        }
+        return -1;
     }
 
     @Override

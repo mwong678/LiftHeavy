@@ -362,7 +362,8 @@ public class RoutinesFragment extends Fragment{
                 });
 
                 populateCurrentRoutineList(itemValue);
-                routineAdapter = new RoutineAdapter(getContext(), routineRepo.getRoutine(itemValue));
+                routineAdapter = new RoutineAdapter(getContext(), routineRepo.getRoutine(itemValue), startWorkoutListView);
+                routineAdapter.setRoutineAdapter(routineAdapter);
                 startWorkoutListView.setAdapter(routineAdapter);
 
 
@@ -481,7 +482,11 @@ public class RoutinesFragment extends Fragment{
                                         boolean value = checked.get(key);
                                         if (value) {
                                             String toADD = (String) addRoutineExercisesListView.getItemAtPosition(key);
-                                            if (!listOfNewRoutineExercises.contains(toADD)){
+                                            List<String> listOfCurrentExercises = new ArrayList<String>();
+                                            for (Routine r: routineRepo.getRoutine(itemValue)){
+                                                listOfCurrentExercises.add(r.getExercise());
+                                            }
+                                            if (!listOfCurrentExercises.contains(toADD)){
                                                 listOfNewRoutineExercises.add(toADD);
                                             }
                                         }
@@ -492,7 +497,8 @@ public class RoutinesFragment extends Fragment{
                                     addRoutine(itemValue, listOfNewRoutineExercises);
                                     Toast.makeText(getContext(), "Added " + listOfNewRoutineExercises.size() + " exercises!", Toast.LENGTH_SHORT).show();
                                     listOfNewRoutineExercises.clear();
-                                    routineAdapter = new RoutineAdapter(getContext(), routineRepo.getRoutine(itemValue));
+                                    routineAdapter = new RoutineAdapter(getContext(), routineRepo.getRoutine(itemValue), startWorkoutListView);
+                                    routineAdapter.setRoutineAdapter(routineAdapter);
                                     startWorkoutListView.setAdapter(routineAdapter);
                                 }
 
