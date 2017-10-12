@@ -362,7 +362,7 @@ public class RoutinesFragment extends Fragment{
                 });
 
                 populateCurrentRoutineList(itemValue);
-                routineAdapter = new RoutineAdapter(getContext(), routineRepo.getRoutine(itemValue), startWorkoutListView);
+                routineAdapter = new RoutineAdapter(getContext(), routineRepo.getRoutine(itemValue), startWorkoutListView, itemValue);
                 routineAdapter.setRoutineAdapter(routineAdapter);
                 startWorkoutListView.setAdapter(routineAdapter);
 
@@ -497,7 +497,7 @@ public class RoutinesFragment extends Fragment{
                                     addRoutine(itemValue, listOfNewRoutineExercises);
                                     Toast.makeText(getContext(), "Added " + listOfNewRoutineExercises.size() + " exercises!", Toast.LENGTH_SHORT).show();
                                     listOfNewRoutineExercises.clear();
-                                    routineAdapter = new RoutineAdapter(getContext(), routineRepo.getRoutine(itemValue), startWorkoutListView);
+                                    routineAdapter = new RoutineAdapter(getContext(), routineRepo.getRoutine(itemValue), startWorkoutListView, itemValue);
                                     routineAdapter.setRoutineAdapter(routineAdapter);
                                     startWorkoutListView.setAdapter(routineAdapter);
                                 }

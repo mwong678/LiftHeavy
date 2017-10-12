@@ -43,7 +43,19 @@ public class RoutineRepo {
 
     public void deleteRoutine(String name){
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        //String selectQuery = "SELECT * FROM " + Routine.TABLE + " WHERE " + Routine.KEY_Name + "=?";
+        //db.execSQL(selectQuery, new String[]{name});
         db.execSQL("DELETE FROM " + Routine.TABLE + " WHERE " + Routine.KEY_Name + "= '" + name + "'");
+        Log.d("COUNT ", ""+getCount(name));
+        DatabaseManager.getInstance().closeDatabase();
+    }
+
+    public void deleteExercise(String routineName, String exerciseName){
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        //String selectQuery = "SELECT * FROM " + Routine.TABLE + " WHERE " + Routine.KEY_Name + "=?";
+        //db.execSQL(selectQuery, new String[]{name});
+        db.execSQL("DELETE FROM " + Routine.TABLE + " WHERE " + Routine.KEY_Name + "= '" + routineName + "' AND " + Routine.KEY_Exercise + "= '" + exerciseName + "'");
+        Log.d("COUNT ", ""+getCount(routineName));
         DatabaseManager.getInstance().closeDatabase();
     }
 
@@ -51,6 +63,16 @@ public class RoutineRepo {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
         db.delete(Routine.TABLE, null, null);
         DatabaseManager.getInstance().closeDatabase();
+    }
+    public int getCount(String name){
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        String selectQuery = "SELECT COUNT(*) FROM " + Routine.TABLE + " WHERE " + Routine.KEY_Name + "=?";
+        Cursor mCount = db.rawQuery(selectQuery, new String[]{name});
+        mCount.moveToFirst();
+        int count = mCount.getInt(0);
+        mCount.close();
+        DatabaseManager.getInstance().closeDatabase();
+        return count;
     }
 
     public List<Routine> getRoutine(String name){

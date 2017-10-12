@@ -1,6 +1,8 @@
 package liftheavy.com.wongmatthew.liftheavy;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -34,14 +36,16 @@ public class RoutineAdapter extends BaseAdapter{
     private RoutineAdapter routineAdapter;
     private ListView listView;
     private RoutineRepo routineRepo;
+    private String routineName;
 
 
-    public RoutineAdapter(Context context, List<Routine> items, ListView lv){
+    public RoutineAdapter(Context context, List<Routine> items, ListView lv, String rn){
         mContext = context;
         mDataSource = items;
         mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         setCounts  = new HashMap<String, Integer>();
         listView = lv;
+        routineName = rn;
         routineRepo = new RoutineRepo();
         for (Routine r:mDataSource){
             setCounts.put(r.getExercise(), defaultSetCount);
@@ -90,8 +94,25 @@ public class RoutineAdapter extends BaseAdapter{
 
                 for (int position : reverseSortedPositions){
                     setCounts.put(name, setCounts.get(name)-1);
+
                     tableAdapter.notifyDataSetChanged();
                     setListViewHeightBasedOnChildren(workoutListView);
+                    /*
+                    Thread thread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            new Handler(Looper.myLooper()).post(new Runnable() { // Tried new Handler(Looper.myLopper()) also
+                                @Override
+                                public void run() {
+
+                                }
+                            });
+                        }
+                    });
+                    thread.start();*/
+
+
+                    //setListViewHeightBasedOnChildren(workoutListView);
                 }
 
                 //remove exercise if all the sets are gone
@@ -106,9 +127,10 @@ public class RoutineAdapter extends BaseAdapter{
                     }
                     if (mark >= 0){
                         mDataSource.remove(mark);
-                        Log.d("Removed",""+mark);
+                        Log.d("Removed",isZero+"  "+mark);
+                        routineRepo.deleteExercise(routineName, isZero);
                     }
-                    routineRepo.deleteRoutine(isZero);
+
                     routineAdapter.notifyDataSetChanged();
                 }
             }
