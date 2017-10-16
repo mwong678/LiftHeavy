@@ -1,6 +1,8 @@
 package liftheavy.com.wongmatthew.liftheavy;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +18,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.RunnableFuture;
 
 /**
  * Created by Matthew on 10/11/2017.
@@ -28,11 +31,13 @@ public class TableAdapter extends BaseAdapter{
     private LayoutInflater mInflater;
     private HashMap<String, Integer> mDataSource;
     private String key;
+    private Handler mHandler;
 
     public TableAdapter(Context context, HashMap<String, Integer> hashMap, String s){
         mContext = context;
         mDataSource = hashMap;
         key = s;
+        mHandler = new Handler();
         mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -59,11 +64,27 @@ public class TableAdapter extends BaseAdapter{
         // Get view for row item
         View rowView = mInflater.inflate(R.layout.list_item_table, parent, false);
 
-        TextView setNumber = (TextView) rowView.findViewById(R.id.setNumber);
-        EditText weight = (EditText) rowView.findViewById(R.id.weight);
-        EditText reps = (EditText) rowView.findViewById(R.id.reps);
-        setNumber.setText(Integer.toString(position+1));
+        final TextView setNumber = (TextView) rowView.findViewById(R.id.setNumber);
+        final EditText weight = (EditText) rowView.findViewById(R.id.weight);
+        final EditText reps = (EditText) rowView.findViewById(R.id.reps);
+        final int pos = position;
 
+        /*new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        setNumber.setText(Integer.toString(pos+1));
+                        //remove underline
+                        weight.getBackground().clearColorFilter();
+                        reps.getBackground().clearColorFilter();
+                    }
+                });
+            }
+        }).start();*/
+
+        setNumber.setText(Integer.toString(pos+1));
         //remove underline
         weight.getBackground().clearColorFilter();
         reps.getBackground().clearColorFilter();

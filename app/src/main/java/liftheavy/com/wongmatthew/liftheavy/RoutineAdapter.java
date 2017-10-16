@@ -2,10 +2,8 @@ package liftheavy.com.wongmatthew.liftheavy;
 
 import android.content.Context;
 import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -14,8 +12,6 @@ import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -24,7 +20,7 @@ import java.util.List;
  * like.
  */
 
-public class RoutineAdapter extends BaseAdapter{
+public class RoutineAdapter extends BaseAdapter {
 
     private Context mContext;
     private LayoutInflater mInflater;
@@ -37,21 +33,24 @@ public class RoutineAdapter extends BaseAdapter{
     private ListView listView;
     private RoutineRepo routineRepo;
     private String routineName;
+    private Handler mHandler;
 
 
-    public RoutineAdapter(Context context, List<Routine> items, ListView lv, String rn){
+    public RoutineAdapter(Context context, List<Routine> items, ListView lv, String rn) {
         mContext = context;
         mDataSource = items;
         mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        setCounts  = new HashMap<String, Integer>();
+        setCounts = new HashMap<String, Integer>();
         listView = lv;
         routineName = rn;
+        mHandler = new Handler();
         routineRepo = new RoutineRepo();
-        for (Routine r:mDataSource){
+        for (Routine r : mDataSource) {
             setCounts.put(r.getExercise(), defaultSetCount);
         }
     }
-    public void setRoutineAdapter(RoutineAdapter ra){
+
+    public void setRoutineAdapter(RoutineAdapter ra) {
         routineAdapter = ra;
     }
 
@@ -92,42 +91,27 @@ public class RoutineAdapter extends BaseAdapter{
             @Override
             public void onDismiss(ListView listView, int[] reverseSortedPositions) {
 
-                for (int position : reverseSortedPositions){
-                    setCounts.put(name, setCounts.get(name)-1);
-
-                    tableAdapter.notifyDataSetChanged();
-                    setListViewHeightBasedOnChildren(workoutListView);
-                    /*
-                    Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            new Handler(Looper.myLooper()).post(new Runnable() { // Tried new Handler(Looper.myLopper()) also
-                                @Override
-                                public void run() {
-
-                                }
-                            });
-                        }
-                    });
-                    thread.start();*/
-
-
-                    //setListViewHeightBasedOnChildren(workoutListView);
+                for (int position : reverseSortedPositions) {
+                    setCounts.put(name, setCounts.get(name) - 1);
                 }
+                updateSetCount(workoutListView);
+
+
+
 
                 //remove exercise if all the sets are gone
                 String isZero = anyZero();
-                if (isZero != null && routineAdapter != null){
+                if (isZero != null && routineAdapter != null) {
                     setCounts.remove(isZero);
                     int mark = -1;
-                    for (int i=0;i<mDataSource.size();i++){
-                        if (mDataSource.get(i).getExercise().equals(isZero)){
+                    for (int i = 0; i < mDataSource.size(); i++) {
+                        if (mDataSource.get(i).getExercise().equals(isZero)) {
                             mark = i;
                         }
                     }
-                    if (mark >= 0){
+                    if (mark >= 0) {
                         mDataSource.remove(mark);
-                        Log.d("Removed",isZero+"  "+mark);
+                        Log.d("Removed", isZero + "  " + mark);
                         routineRepo.deleteExercise(routineName, isZero);
                     }
 
@@ -145,6 +129,7 @@ public class RoutineAdapter extends BaseAdapter{
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String itemValue = (String) adapterView.getItemAtPosition(i);
+                Log.d("",itemValue);
             }
         });
 
@@ -157,20 +142,19 @@ public class RoutineAdapter extends BaseAdapter{
         });
 
 
-
         return rowView;
     }
 
-    private String anyZero(){
-        for (String key:setCounts.keySet()){
-            if (setCounts.get(key) <= 0){
+    private String anyZero() {
+        for (String key : setCounts.keySet()) {
+            if (setCounts.get(key) <= 0) {
                 return key;
             }
         }
         return null;
     }
 
-    private void updateSetCount(ListView listView){
+    private void updateSetCount(ListView listView) {
         tableAdapter.notifyDataSetChanged();
         setListViewHeightBasedOnChildren(listView);
     }

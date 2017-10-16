@@ -349,6 +349,7 @@ public class RoutinesFragment extends Fragment{
                 final Dialog dialog = new Dialog(getContext());
                 dialog.getWindow().getAttributes().windowAnimations = R.style.DialogTheme;
                 dialog.setContentView(R.layout.start_workout);
+                dialog.setCanceledOnTouchOutside(false);
                 startWorkoutTextView = (TextView) dialog.findViewById(R.id.startWorkoutTextView);
                 startWorkoutListView = (ListView) dialog.findViewById(R.id.startWorkoutListView);
                 startWorkoutTextView.setText(itemValue);
@@ -538,7 +539,6 @@ public class RoutinesFragment extends Fragment{
                 }
             });
         }
-
     }
 
     private void updateList(){

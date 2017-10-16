@@ -40,6 +40,8 @@ public class SwipeDismissListViewTouchListener implements View.OnTouchListener {
     private int mDownPosition;
     private View mDownView;
     private boolean mPaused;
+    /* shortens the animation */
+    private int animationShortner = 200;
 
 
     public interface DismissCallbacks {
@@ -57,7 +59,7 @@ public class SwipeDismissListViewTouchListener implements View.OnTouchListener {
         mMinFlingVelocity = vc.getScaledMinimumFlingVelocity() * 16;
         mMaxFlingVelocity = vc.getScaledMaximumFlingVelocity();
         mAnimationTime = listView.getContext().getResources().getInteger(
-                android.R.integer.config_shortAnimTime);
+                android.R.integer.config_shortAnimTime) - animationShortner;
         mListView = listView;
         mCallbacks = callbacks;
     }
