@@ -15,6 +15,7 @@ public class HistoryRepo {
 
     public static String createTable(){
         return "CREATE TABLE " + History.TABLE  + "("
+                + History.KEY_Id  + "   TEXT,"
                 + History.KEY_Routine  + "   TEXT,"
                 + History.KEY_Exercise  + "   TEXT,"
                 + History.KEY_Reps  + "   TEXT,"
@@ -29,6 +30,7 @@ public class HistoryRepo {
     public void insert(Routine routine) {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
         ContentValues values = new ContentValues();
+        values.put(History.KEY_Id, history.getId());
         values.put(History.KEY_Routine, history.getRoutine());
         values.put(History.KEY_Exercise, history.getExercise());
         values.put(History.KEY_Reps, history.getReps());

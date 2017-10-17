@@ -354,19 +354,39 @@ public class RoutinesFragment extends Fragment{
                 startWorkoutListView = (ListView) dialog.findViewById(R.id.startWorkoutListView);
                 startWorkoutTextView.setText(itemValue);
                 dialog.setTitle("Start Workout");
-                Button cancelWorkoutButton = (Button) dialog.findViewById(R.id.cancelWorkoutButton);
-                cancelWorkoutButton.setOnClickListener(new View.OnClickListener(){
-                    @Override
-                    public void onClick(View view) {
-                        dialog.dismiss();
-                    }
-                });
 
                 populateCurrentRoutineList(itemValue);
                 routineAdapter = new RoutineAdapter(getContext(), routineRepo.getRoutine(itemValue), startWorkoutListView, itemValue);
                 routineAdapter.setRoutineAdapter(routineAdapter);
                 startWorkoutListView.setAdapter(routineAdapter);
 
+                Button cancelWorkoutButton = (Button) dialog.findViewById(R.id.cancelWorkoutButton);
+                cancelWorkoutButton.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View view) {
+                        View v = null;
+                        View v2 = null;
+                        for (int i = 0; i < routineAdapter.getCount(); i++) {
+                            v = routineAdapter.getView(i, view, startWorkoutListView);
+                            //v = startWorkoutListView.getAdapter().getView(i, null, null);
+                            TextView exerciseName = (TextView) v.findViewById(R.id.exerciseName);
+                            ListView table = (ListView) v.findViewById(R.id.workoutListView);
+                            print("Exercise Name", exerciseName.getText().toString());
+                            for (int j=0;j<table.getAdapter().getCount();j++){
+                                v2 = table.getAdapter().getView(j, v, table);
+                                TextView setNumber = (TextView) v2.findViewById(R.id.setNumber);
+                                EditText weightAmount = (EditText) v2.findViewById(R.id.weight);
+                                EditText repAmount = (EditText) v2.findViewById(R.id.reps);
+                                print("Set Number", setNumber.getText().toString());
+                                print(weightAmount.getText().toString());
+                                print(repAmount.getText().toString());
+                                //TODO
+                            }
+                        }
+
+                        dialog.dismiss();
+                    }
+                });
 
                 Button addExercisesButton = (Button) dialog.findViewById(R.id.addExercisesButton);
                 addExercisesButton.setOnClickListener(new View.OnClickListener() {
@@ -511,6 +531,7 @@ public class RoutinesFragment extends Fragment{
                         addRoutineExercisesCancelButton.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
+
                                 dialog2.dismiss();
                             }
                         });
@@ -579,6 +600,9 @@ public class RoutinesFragment extends Fragment{
 
     private void print(String x){
         Log.d(x,x);
+    }
+    private void print(String x, String y){
+        Log.d(x,y);
     }
 
     private void populateRoutineList(){

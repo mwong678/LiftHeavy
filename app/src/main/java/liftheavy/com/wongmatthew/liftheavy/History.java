@@ -7,6 +7,7 @@ public class History {
     public static final String TAG = History.class.getSimpleName();
     public static final String TABLE = "History";
     //Columns
+    public static final String KEY_Id = "Id";
     public static final String KEY_Routine = "Routine";
     public static final String KEY_Exercise = "Exercise";
     public static final String KEY_Reps = "Reps";
@@ -17,6 +18,7 @@ public class History {
     public static final String KEY_Date = "Date";
 
     private String routine;
+    private String id;
     private String exercise;
     private String reps;
     private String sets;
@@ -24,6 +26,13 @@ public class History {
     private String duration;
     private String distance;
     private String date;
+
+    public String getId(){
+        return id;
+    }
+    public void setId(String id){
+        this.id = id;
+    }
 
     public String getRoutine(){
         return routine;

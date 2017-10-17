@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -22,13 +23,21 @@ import java.util.List;
 
 public class RoutineAdapter extends BaseAdapter {
 
+    static class ViewHolder {
+        Routine routine;
+        TextView exerciseName;
+        Button addSetButton;
+        ListView workoutListView;
+        SwipeDismissListViewTouchListener touchListener;
+    }
+
     private Context mContext;
     private LayoutInflater mInflater;
     private List<Routine> mDataSource;
     private TableAdapter tableAdapter;
     private int defaultSetCount = 3;
-    private Button addSetButton;
-    private HashMap<String, Integer> setCounts;
+    private HashMap<String, Integer> overallSetCounts;
+    private HashMap<String, TableAdapter> tableAdapterHashMap;
     private RoutineAdapter routineAdapter;
     private ListView listView;
     private RoutineRepo routineRepo;
@@ -40,14 +49,16 @@ public class RoutineAdapter extends BaseAdapter {
         mContext = context;
         mDataSource = items;
         mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        setCounts = new HashMap<String, Integer>();
+        overallSetCounts = new HashMap<String, Integer>();
+        tableAdapterHashMap = new HashMap<String, TableAdapter>();
         listView = lv;
         routineName = rn;
         mHandler = new Handler();
         routineRepo = new RoutineRepo();
         for (Routine r : mDataSource) {
-            setCounts.put(r.getExercise(), defaultSetCount);
+            Log.d("DATASOURCE "+mDataSource, r.getExercise());
         }
+
     }
 
     public void setRoutineAdapter(RoutineAdapter ra) {
@@ -71,91 +82,126 @@ public class RoutineAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // Get view for row item
-        View rowView = mInflater.inflate(R.layout.list_item_workout, parent, false);
-        Routine r = (Routine) getItem(position);
-        final String name = r.getExercise();
-        final TextView exerciseName = (TextView) rowView.findViewById(R.id.exerciseName);
-        exerciseName.setText(name);
+        final ViewHolder viewHolder;
+        final int pos = position;
+        View rowView = convertView;
 
-        addSetButton = (Button) rowView.findViewById(R.id.addSetButton);
-        final ListView workoutListView = (ListView) rowView.findViewById(R.id.workoutListView);
+        if (rowView == null) {
+            rowView = mInflater.inflate(R.layout.list_item_workout, parent, false);
+            viewHolder = new ViewHolder();
+            viewHolder.routine = (Routine) getItem(pos);
+            final String name = viewHolder.routine.getExercise();
+            viewHolder.exerciseName = (TextView) rowView.findViewById(R.id.exerciseName);
+            viewHolder.addSetButton = (Button) rowView.findViewById(R.id.addSetButton);
+            viewHolder.workoutListView = (ListView) rowView.findViewById(R.id.workoutListView);
+            //viewHolder.tableAdapter = new TableAdapter(mContext, overallSetCounts, name);
+            //Log.d("POSITION "+position, name);
+            overallSetCounts.put(name, defaultSetCount);
+            tableAdapterHashMap.put(name, new TableAdapter(mContext, overallSetCounts, name));
+            tableAdapterHashMap.get(name).setTableAdapter(tableAdapterHashMap.get(name));
+            viewHolder.exerciseName.setText(name);
 
-        //swipe to delete a set
-        SwipeDismissListViewTouchListener touchListener = new SwipeDismissListViewTouchListener(workoutListView, new SwipeDismissListViewTouchListener.DismissCallbacks() {
-            @Override
-            public boolean canDismiss(int position) {
-                return true;
-            }
+            viewHolder.workoutListView.setAdapter(tableAdapterHashMap.get(name));
+            setListViewHeightBasedOnChildren(viewHolder.workoutListView);
 
-            @Override
-            public void onDismiss(ListView listView, int[] reverseSortedPositions) {
 
-                for (int position : reverseSortedPositions) {
-                    setCounts.put(name, setCounts.get(name) - 1);
+            //set tag for row
+            rowView.setTag(viewHolder);
+
+
+            viewHolder.touchListener = new SwipeDismissListViewTouchListener(viewHolder.workoutListView, new SwipeDismissListViewTouchListener.DismissCallbacks() {
+                @Override
+                public boolean canDismiss(int position) {
+                    return true;
                 }
-                updateSetCount(workoutListView);
+
+                @Override
+                public void onDismiss(ListView listView, int[] reverseSortedPositions) {
+
+                    for (int position : reverseSortedPositions) {
+                        overallSetCounts.put(name, overallSetCounts.get(name) - 1);
+                    }
+                    updateSetCount(name, viewHolder.workoutListView);
 
 
-
-
-                //remove exercise if all the sets are gone
-                String isZero = anyZero();
-                if (isZero != null && routineAdapter != null) {
-                    setCounts.remove(isZero);
-                    int mark = -1;
-                    for (int i = 0; i < mDataSource.size(); i++) {
-                        if (mDataSource.get(i).getExercise().equals(isZero)) {
-                            mark = i;
+                    //remove exercise if all the sets are gone
+                    String isZero = anyZero(viewHolder);
+                    if (isZero != null && routineAdapter != null) {
+                        overallSetCounts.remove(isZero);
+                        int mark = -1;
+                        for (int i = 0; i < mDataSource.size(); i++) {
+                            if (mDataSource.get(i).getExercise().equals(isZero)) {
+                                mark = i;
+                            }
                         }
-                    }
-                    if (mark >= 0) {
-                        mDataSource.remove(mark);
-                        Log.d("Removed", isZero + "  " + mark);
-                        routineRepo.deleteExercise(routineName, isZero);
-                    }
+                        if (mark >= 0) {
+                            mDataSource.remove(mark);
+                            Log.d("Removed", isZero + "  " + mark);
+                            routineRepo.deleteExercise(routineName, isZero);
+                        }
 
-                    routineAdapter.notifyDataSetChanged();
+                        routineAdapter.notifyDataSetChanged();
+                    }
                 }
-            }
-        });
+            });
 
-        workoutListView.setOnTouchListener(touchListener);
+            viewHolder.workoutListView.setOnTouchListener(viewHolder.touchListener);
 
-        tableAdapter = new TableAdapter(mContext, setCounts, name);
-        workoutListView.setAdapter(tableAdapter);
-        setListViewHeightBasedOnChildren(workoutListView);
-        workoutListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String itemValue = (String) adapterView.getItemAtPosition(i);
-                Log.d("",itemValue);
-            }
-        });
 
-        addSetButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setCounts.put(name, setCounts.get(name) + 1);
-                updateSetCount(workoutListView);
+            viewHolder.workoutListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    String itemValue = (String) adapterView.getItemAtPosition(i);
+                    //Log.d("", itemValue);
+                }
+            });
+
+            viewHolder.addSetButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    overallSetCounts.put(name, overallSetCounts.get(name) + 1);
+                    updateSetCount(name, viewHolder.workoutListView);
+                }
+            });
+        } else {
+            viewHolder = (ViewHolder) rowView.getTag();
+            final String name = ((Routine) getItem(pos)).getExercise();
+            viewHolder.exerciseName.setText(name);
+            if (!overallSetCounts.containsKey(name))
+                overallSetCounts.put(name, defaultSetCount);
+            if (!tableAdapterHashMap.containsKey(name)) {
+                tableAdapterHashMap.put(name, new TableAdapter(mContext, overallSetCounts, name));
+                tableAdapterHashMap.get(name).setTableAdapter(tableAdapterHashMap.get(name));
             }
-        });
+            viewHolder.workoutListView.setAdapter(tableAdapterHashMap.get(name));
+            tableAdapterHashMap.get(name).setTableAdapter(tableAdapterHashMap.get(name));
+            updateSetCount(name, viewHolder.workoutListView);
+
+            viewHolder.addSetButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    overallSetCounts.put(name, overallSetCounts.get(name) + 1);
+                    updateSetCount(name, viewHolder.workoutListView);
+                }
+            });
+
+        }
 
 
         return rowView;
     }
 
-    private String anyZero() {
-        for (String key : setCounts.keySet()) {
-            if (setCounts.get(key) <= 0) {
+    private String anyZero(ViewHolder viewHolder) {
+        for (String key : overallSetCounts.keySet()) {
+            if (overallSetCounts.get(key) <= 0) {
                 return key;
             }
         }
         return null;
     }
 
-    private void updateSetCount(ListView listView) {
-        tableAdapter.notifyDataSetChanged();
+    private void updateSetCount(String name, ListView listView) {
+        tableAdapterHashMap.get(name).notifyDataSetChanged();
         setListViewHeightBasedOnChildren(listView);
     }
 
