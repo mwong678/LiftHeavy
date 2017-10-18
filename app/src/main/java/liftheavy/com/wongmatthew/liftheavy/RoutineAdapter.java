@@ -55,10 +55,6 @@ public class RoutineAdapter extends BaseAdapter {
         routineName = rn;
         mHandler = new Handler();
         routineRepo = new RoutineRepo();
-        for (Routine r : mDataSource) {
-            Log.d("DATASOURCE "+mDataSource, r.getExercise());
-        }
-
     }
 
     public void setRoutineAdapter(RoutineAdapter ra) {
@@ -94,13 +90,12 @@ public class RoutineAdapter extends BaseAdapter {
             viewHolder.exerciseName = (TextView) rowView.findViewById(R.id.exerciseName);
             viewHolder.addSetButton = (Button) rowView.findViewById(R.id.addSetButton);
             viewHolder.workoutListView = (ListView) rowView.findViewById(R.id.workoutListView);
-            //viewHolder.tableAdapter = new TableAdapter(mContext, overallSetCounts, name);
-            //Log.d("POSITION "+position, name);
             overallSetCounts.put(name, defaultSetCount);
-            tableAdapterHashMap.put(name, new TableAdapter(mContext, overallSetCounts, name));
-            tableAdapterHashMap.get(name).setTableAdapter(tableAdapterHashMap.get(name));
+            if (!tableAdapterHashMap.containsKey(name)) {
+                tableAdapterHashMap.put(name, new TableAdapter(mContext, overallSetCounts, name));
+                tableAdapterHashMap.get(name).setTableAdapter(tableAdapterHashMap.get(name));
+            }
             viewHolder.exerciseName.setText(name);
-
             viewHolder.workoutListView.setAdapter(tableAdapterHashMap.get(name));
             setListViewHeightBasedOnChildren(viewHolder.workoutListView);
 
@@ -125,7 +120,7 @@ public class RoutineAdapter extends BaseAdapter {
 
 
                     //remove exercise if all the sets are gone
-                    String isZero = anyZero(viewHolder);
+                    String isZero = anyZero();
                     if (isZero != null && routineAdapter != null) {
                         overallSetCounts.remove(isZero);
                         int mark = -1;
@@ -191,7 +186,7 @@ public class RoutineAdapter extends BaseAdapter {
         return rowView;
     }
 
-    private String anyZero(ViewHolder viewHolder) {
+    private String anyZero() {
         for (String key : overallSetCounts.keySet()) {
             if (overallSetCounts.get(key) <= 0) {
                 return key;

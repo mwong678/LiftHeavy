@@ -34,8 +34,8 @@ import static liftheavy.com.wongmatthew.liftheavy.App.getContext;
  * uses the key specified to find how many of the current set there are
  */
 
-public class TableAdapter extends BaseAdapter{
-    static class ViewHolder{
+public class TableAdapter extends BaseAdapter {
+    static class ViewHolder {
         TextView setNumber;
         EditText weight;
         EditText reps;
@@ -43,6 +43,7 @@ public class TableAdapter extends BaseAdapter{
         int ref;
         //HashMap<Integer, String[]> saveState;
     }
+
     private Context mContext;
     private LayoutInflater mInflater;
     private HashMap<String, Integer> mDataSource;
@@ -51,7 +52,7 @@ public class TableAdapter extends BaseAdapter{
     private Handler mHandler;
     private TableAdapter tableAdapter;
 
-    public TableAdapter(Context context, HashMap<String, Integer> hashMap, String s){
+    public TableAdapter(Context context, HashMap<String, Integer> hashMap, String s) {
         mContext = context;
         mDataSource = hashMap;
         key = s;
@@ -60,13 +61,13 @@ public class TableAdapter extends BaseAdapter{
         mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public void setTableAdapter(TableAdapter ta){
+    public void setTableAdapter(TableAdapter ta) {
         tableAdapter = ta;
     }
 
     @Override
     public int getCount() {
-        if (mDataSource.get(key) != null){
+        if (mDataSource.get(key) != null) {
             return mDataSource.get(key);
         }
         return -1;
@@ -82,15 +83,29 @@ public class TableAdapter extends BaseAdapter{
         return position;
     }
 
+    private void update() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        tableAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        }).start();
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final ViewHolder viewHolder;
         final int pos = position;
-        View rowView  = convertView;
+        View rowView = convertView;
         // Get view for row item
-        if (rowView == null){
+        if (rowView == null) {
 
-            rowView =  mInflater.inflate(R.layout.list_item_table, parent, false);
+            rowView = mInflater.inflate(R.layout.list_item_table, parent, false);
             viewHolder = new ViewHolder();
             viewHolder.setNumber = (TextView) rowView.findViewById(R.id.setNumber);
             viewHolder.weight = (EditText) rowView.findViewById(R.id.weight);
@@ -98,19 +113,10 @@ public class TableAdapter extends BaseAdapter{
             viewHolder.key = key;
             viewHolder.ref = position;
 
-            viewHolder.setNumber.setText(Integer.toString(pos+1));
+            viewHolder.setNumber.setText(Integer.toString(pos + 1));
             viewHolder.weight.getBackground().clearColorFilter();
             viewHolder.reps.getBackground().clearColorFilter();
 
-            /*
-            String[] values = saveState.get(viewHolder.key+viewHolder.ref);
-
-            if (values != null){
-                Log.d("values", values[0]+"  "+values[1]);
-                viewHolder.weight.setText(values[0]);
-                viewHolder.reps.setText(values[1]);
-            }
-            */
             rowView.setTag(viewHolder);
 
             viewHolder.weight.addTextChangedListener(new TextWatcher() {
@@ -121,16 +127,16 @@ public class TableAdapter extends BaseAdapter{
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    String weightValue = viewHolder.weight.getText().toString();
-                    String repValue = viewHolder.reps.getText().toString();
-                    saveState.put(viewHolder.key + viewHolder.ref, new String[]{weightValue, repValue});
-                    tableAdapter.notifyDataSetChanged();
+
+
                 }
 
                 @Override
                 public void afterTextChanged(Editable s) {
-
-                    //Log.d(weightValue, repValue);
+                    String weightValue = viewHolder.weight.getText().toString();
+                    String repValue = viewHolder.reps.getText().toString();
+                    saveState.put(viewHolder.key + viewHolder.ref, new String[]{weightValue, repValue});
+                    tableAdapter.notifyDataSetChanged();
                 }
             });
 
@@ -142,45 +148,35 @@ public class TableAdapter extends BaseAdapter{
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    String weightValue = viewHolder.weight.getText().toString();
-                    String repValue = viewHolder.reps.getText().toString();
-                    saveState.put(viewHolder.key+viewHolder.ref, new String[]{weightValue, repValue});
-                    tableAdapter.notifyDataSetChanged();
                 }
 
                 @Override
                 public void afterTextChanged(Editable s) {
-
+                    String weightValue = viewHolder.weight.getText().toString();
+                    String repValue = viewHolder.reps.getText().toString();
+                    saveState.put(viewHolder.key + viewHolder.ref, new String[]{weightValue, repValue});
+                    tableAdapter.notifyDataSetChanged();
                 }
             });
 
 
-
-
-
-        }else{
+        } else {
             viewHolder = (ViewHolder) rowView.getTag();
-            //Log.d(key+" SIZE", saveState.size()+"");
-            String[] values = saveState.get(viewHolder.key+viewHolder.ref);
-            for (String key:saveState.keySet()){
-                //Log.d("key", key+"");
-            }
 
-            if (values != null){
-                Log.d("values", values[0]+"  "+values[1]);
-                viewHolder.weight.getText().clear();
-                viewHolder.weight.append(values[0]);
-                viewHolder.reps.getText().clear();
-                viewHolder.reps.append(values[1]);
-            }
         }
 
+        String[] values = saveState.get(viewHolder.key + viewHolder.ref);
 
+        if (values != null) {
+            if (!viewHolder.weight.getText().toString().equals(values[0])) {
+                viewHolder.weight.setText(values[0]);
 
+            }
+            if (!viewHolder.reps.getText().toString().equals(values[1])) {
+                viewHolder.reps.setText(values[1]);
 
-
-
-
+            }
+        }
 
 
         return rowView;
