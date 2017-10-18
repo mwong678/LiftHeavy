@@ -65,6 +65,31 @@ public class TableAdapter extends BaseAdapter {
         tableAdapter = ta;
     }
 
+    public void removeSet(String name, int position, int length){
+        for (int i = position;i < length - 1;i++){
+            String currKey = name + i;
+            String nextKey = name+(i+1);
+            String[] next = saveState.get(nextKey);
+            saveState.put(currKey, next);
+        }
+        int prevSize = saveState.size();
+        saveState.remove(name+(length-1));
+        View v;
+        EditText weight, reps;
+        //iterate through list and clear null elements
+        for (int i=0;i < prevSize;i++){
+            v = tableAdapter.getView(i, null, null);
+            weight = (EditText) v.findViewById(R.id.weight);
+            reps = (EditText) v.findViewById(R.id.reps);
+            String[] val = saveState.get(name+i);
+            if (val == null){
+                weight.setText("");
+                reps.setText("");
+            }
+        }
+        tableAdapter.notifyDataSetChanged();
+    }
+
     @Override
     public int getCount() {
         if (mDataSource.get(key) != null) {

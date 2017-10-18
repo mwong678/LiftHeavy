@@ -115,6 +115,7 @@ public class RoutineAdapter extends BaseAdapter {
 
                     for (int position : reverseSortedPositions) {
                         overallSetCounts.put(name, overallSetCounts.get(name) - 1);
+                        tableAdapterHashMap.get(name).removeSet(name, position, tableAdapterHashMap.size());
                     }
                     updateSetCount(name, viewHolder.workoutListView);
 
