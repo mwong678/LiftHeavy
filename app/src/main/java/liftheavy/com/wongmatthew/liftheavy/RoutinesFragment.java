@@ -106,12 +106,7 @@ public class RoutinesFragment extends Fragment{
         routinesRecentWorkoutDetails.setMovementMethod(new ScrollingMovementMethod());
         //example text
         //TODO
-        routinesRecentWorkoutDetails.setText("Lorem ipsum dolor sit amet, consectetur adipiscing elit,\n" +
-                " sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\n" +
-                " quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute\n" +
-                " irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.\n" +
-                " Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit \n" +
-                "anim id est laborum.");
+        routinesRecentWorkoutDetails.setText("No exercise history is available.");
 
 
 
@@ -367,19 +362,24 @@ public class RoutinesFragment extends Fragment{
                         View v = null;
                         View v2 = null;
                         for (int i = 0; i < routineAdapter.getCount(); i++) {
-                            v = routineAdapter.getView(i, view, startWorkoutListView);
-                            //v = startWorkoutListView.getAdapter().getView(i, null, null);
+                            StringBuilder sb = new StringBuilder();
+                            v = startWorkoutListView.getAdapter().getView(i, null, null);
                             TextView exerciseName = (TextView) v.findViewById(R.id.exerciseName);
                             ListView table = (ListView) v.findViewById(R.id.workoutListView);
                             print("Exercise Name", exerciseName.getText().toString());
                             for (int j=0;j<table.getAdapter().getCount();j++){
-                                v2 = table.getAdapter().getView(j, v, table);
+                                v2 = table.getAdapter().getView(j, null, null);
+                                //v2 = table.getAdapter().getView(j, v, table);
                                 TextView setNumber = (TextView) v2.findViewById(R.id.setNumber);
                                 EditText weightAmount = (EditText) v2.findViewById(R.id.weight);
                                 EditText repAmount = (EditText) v2.findViewById(R.id.reps);
-                                print("Set Number", setNumber.getText().toString());
-                                print(weightAmount.getText().toString());
-                                print(repAmount.getText().toString());
+                                sb.append("Set: "+setNumber.getText().toString()+"\nWeight: "
+                                        +weightAmount.getText().toString()+"\nReps: "+repAmount.getText().toString());
+                                //print("Set Number", setNumber.getText().toString());
+                                //print(weightAmount.getText().toString());
+                                //print(repAmount.getText().toString());
+                                Log.d("", sb.toString());
+                                sb.setLength(0);
                                 //TODO
                             }
                         }
