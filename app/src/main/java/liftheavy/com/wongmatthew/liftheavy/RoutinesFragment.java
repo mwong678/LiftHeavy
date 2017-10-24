@@ -105,7 +105,7 @@ public class RoutinesFragment extends Fragment{
         }
         routinesRecentWorkoutDetails.setMovementMethod(new ScrollingMovementMethod());
         //example text
-        //TODO
+        //TODO provide most recent workout data
         routinesRecentWorkoutDetails.setText("No exercise history is available.");
 
 
@@ -150,7 +150,6 @@ public class RoutinesFragment extends Fragment{
                         addRoutineExercisesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                             @Override
                             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                                //print(""+i);
                                 addRoutineExercisesListView.setItemChecked(i, addRoutineExercisesListView.isItemChecked(i));
                             }
                         });
@@ -369,18 +368,14 @@ public class RoutinesFragment extends Fragment{
                             print("Exercise Name", exerciseName.getText().toString());
                             for (int j=0;j<table.getAdapter().getCount();j++){
                                 v2 = table.getAdapter().getView(j, null, null);
-                                //v2 = table.getAdapter().getView(j, v, table);
                                 TextView setNumber = (TextView) v2.findViewById(R.id.setNumber);
                                 EditText weightAmount = (EditText) v2.findViewById(R.id.weight);
                                 EditText repAmount = (EditText) v2.findViewById(R.id.reps);
                                 sb.append("Set: "+setNumber.getText().toString()+"\nWeight: "
                                         +weightAmount.getText().toString()+"\nReps: "+repAmount.getText().toString());
-                                //print("Set Number", setNumber.getText().toString());
-                                //print(weightAmount.getText().toString());
-                                //print(repAmount.getText().toString());
                                 Log.d("", sb.toString());
                                 sb.setLength(0);
-                                //TODO
+                                //TODO RECORDING EXERCISES
                             }
                         }
 
@@ -518,9 +513,15 @@ public class RoutinesFragment extends Fragment{
                                     addRoutine(itemValue, listOfNewRoutineExercises);
                                     Toast.makeText(getContext(), "Added " + listOfNewRoutineExercises.size() + " exercises!", Toast.LENGTH_SHORT).show();
                                     listOfNewRoutineExercises.clear();
-                                    routineAdapter = new RoutineAdapter(getContext(), routineRepo.getRoutine(itemValue), startWorkoutListView, itemValue);
+                                    //i commented this out because it kept clearing the preexisting
+                                    //set data when you added new exercises
+                                    //so instead it resets the datasource and notifies
+                                    //that the dataset was changed
+                                    //routineAdapter = new RoutineAdapter(getContext(), routineRepo.getRoutine(itemValue), startWorkoutListView, itemValue);
+                                    routineAdapter.setDataSource(routineRepo.getRoutine(itemValue));
                                     routineAdapter.setRoutineAdapter(routineAdapter);
                                     startWorkoutListView.setAdapter(routineAdapter);
+                                    routineAdapter.notifyDataSetChanged();
                                 }
 
                                 dialog2.dismiss();

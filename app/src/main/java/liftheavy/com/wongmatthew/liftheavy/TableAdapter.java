@@ -2,31 +2,16 @@ package liftheavy.com.wongmatthew.liftheavy;
 
 import android.content.Context;
 import android.os.Handler;
-import android.os.Looper;
-import android.support.design.widget.TabLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.RunnableFuture;
 
-import static android.content.Context.INPUT_METHOD_SERVICE;
-import static liftheavy.com.wongmatthew.liftheavy.App.getContext;
 
 /**
  * Created by Matthew on 10/11/2017.
@@ -41,7 +26,6 @@ public class TableAdapter extends BaseAdapter {
         EditText reps;
         String key;
         int ref;
-        //HashMap<Integer, String[]> saveState;
     }
 
     private Context mContext;
@@ -63,6 +47,10 @@ public class TableAdapter extends BaseAdapter {
 
     public void setTableAdapter(TableAdapter ta) {
         tableAdapter = ta;
+    }
+
+    public void setDataSource(HashMap<String, Integer> items){
+        mDataSource = items;
     }
 
     public void removeSet(String name, int position, int length){
@@ -106,20 +94,6 @@ public class TableAdapter extends BaseAdapter {
     @Override
     public long getItemId(int position) {
         return position;
-    }
-
-    private void update() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        tableAdapter.notifyDataSetChanged();
-                    }
-                });
-            }
-        }).start();
     }
 
     @Override
@@ -187,7 +161,6 @@ public class TableAdapter extends BaseAdapter {
 
         } else {
             viewHolder = (ViewHolder) rowView.getTag();
-
         }
 
         String[] values = saveState.get(viewHolder.key + viewHolder.ref);
